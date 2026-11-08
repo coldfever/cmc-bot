@@ -35,7 +35,11 @@ class SetupServer(commands.Cog):
         cfg = self.bot.cfg
         roles = [{"name": cfg.staff_role, "color": cfg.staff_role_raw.get("culoare"), "hoist": cfg.staff_role_raw.get("separat", True)}]
         for r in cfg.extra_roles:
+            if r["nume"] == "Membru" and not cfg.verification:
+                continue
             roles.append({"name": r["nume"], "color": r.get("culoare"), "hoist": r.get("separat", False)})
+        if cfg.member_role and all(r["name"] != cfg.member_role for r in roles):
+            roles.append({"name": cfg.member_role, "color": None, "hoist": False})
         for g in cfg.games:
             roles.append({"name": g.role, "color": g.color, "hoist": False})
             if g.competitive_role:
@@ -51,6 +55,13 @@ class SetupServer(commands.Cog):
             ow[guild.default_role] = discord.PermissionOverwrite(view_channel=False)
             if staff:
                 ow[staff] = discord.PermissionOverwrite(view_channel=True)
+        elif spec.access == "membri" and cfg.member_role:
+            ow[guild.default_role] = discord.PermissionOverwrite(view_channel=False)
+            member = roles.get(cfg.member_role)
+            if member:
+                ow[member] = discord.PermissionOverwrite(view_channel=True)
+            if staff:
+                ow[staff] = discord.PermissionOverwrite(view_channel=True)
         elif spec.access == "game" and cfg.hide_games:
             ow[guild.default_role] = discord.PermissionOverwrite(view_channel=False)
             game_role = roles.get(spec.game_role or "")
@@ -61,7 +72,18 @@ class SetupServer(commands.Cog):
         return ow
 
     def _channel_overwrites(self, guild, category: discord.CategoryChannel, spec: ChannelSpec, roles):
-        ow = dict(category.overwrites)
+        ow = {k: discord.PermissionOverwrite.from_pair(*v.pair()) for k, v in category.overwrites.items()}
+        cfg = self.bot.cfg
+        if spec.access in ("membri", "staff"):
+            base = ow.get(guild.default_role, discord.PermissionOverwrite())
+            base.update(view_channel=False)
+            ow[guild.default_role] = base
+            for role_name in ([cfg.member_role] if spec.access == "membri" else []) + [cfg.staff_role]:
+                role = roles.get(role_name or "")
+                if role:
+                    r = ow.get(role, discord.PermissionOverwrite())
+                    r.update(view_channel=True)
+                    ow[role] = r
         if spec.readonly:
             base = ow.get(guild.default_role, discord.PermissionOverwrite())
             base.update(send_messages=False, create_public_threads=False, add_reactions=True)

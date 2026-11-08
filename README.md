@@ -11,8 +11,9 @@ Un singur bot pentru tot serverul CMC: structura serverului, bun venit, alegerea
 | Comandă | Cine | Ce face |
 |---|---|---|
 | `/configureaza-server` | admin | Creează rolurile, categoriile și canalele lipsă din `config/server.yaml`. Implicit e **simulare** și nu șterge niciodată nimic. |
-| `/panou-roluri` | admin | Postează în `#alege-jocurile` meniul din care membrii își aleg jocurile și ping-urile de turneu. |
-| `/posteaza-regulament` | admin | Postează regulamentul standard (text în `bot/cogs/admin.py`). |
+| `/panou-roluri` | admin | Postează în `#alege-jocurile` iconițele (butoanele) din care membrii își aleg jocurile și ping-urile de turneu. |
+| `/membri-existenti` | admin | Dă rolul **Membru** tuturor celor care erau deja pe server (o singură dată, când pornești verificarea). |
+| `/posteaza-regulament` | admin | Postează regulamentul (text în `bot/cogs/admin.py`) cu butonul **„Accept regulamentul”**. |
 | `/verifica-bot` | admin | Verifică permisiunile, poziția rolului, canalele și setările. |
 | `/anunta` | staff | Anunț oficial frumos formatat, opțional cu @everyone. |
 | `/eveniment creeaza` | staff | Anunță un turneu în canalul jocului, cu ping la rol, butoane Vin / Poate / Nu vin, limită de locuri cu listă de așteptare, plus adăugare în calendarul Discord. Trimite remindere automate cu 24h și 1h înainte. |
@@ -80,6 +81,23 @@ Planul Hobby de pe Railway costă ~5 $/lună și ajunge din plin pentru botul ă
 7. Opțional: `/stiri adauga` pentru fluxurile de știri dorite (link RSS, de exemplu un canal YouTube: `https://www.youtube.com/feeds/videos.xml?channel_id=...`).
 
 **Despre `ascunde_jocuri_fara_rol`:** în config e `false`, deci toată lumea vede toate jocurile. După ce membrii își aleg rolurile din `#alege-jocurile` (anunță-i), îl poți pune pe `true` și rulezi `/configureaza-server simulare:False actualizeaza_permisiuni:True`. Atunci fiecare vede doar jocurile lui.
+
+---
+
+## Cum intră un membru nou
+
+1. Vede doar categoria **Bun venit**: `#bun-venit`, `#regulament`, `#anunturi`.
+2. Citește `#regulament` și apasă **✅ Am citit și accept regulamentul** → primește rolul **Membru** și vede restul serverului (Magazin, Comunitate, Voce) plus `#alege-jocurile`.
+3. În `#alege-jocurile` apasă pe iconița fiecărui joc pe care îl joacă → îi apar doar categoriile acelor jocuri. Al doilea set de butoane (🏆) e pentru ping la turnee.
+
+Se controlează din `config/server.yaml`: `verificare.activ` și `ascunde_jocuri_fara_rol`.
+
+**Pornirea verificării pe un server care are deja membri** (ordinea contează, altfel membrii existenți pierd accesul):
+1. `/configureaza-server simulare:False` – creează rolul Membru.
+2. `/membri-existenti` – le dă rolul tuturor celor de pe server.
+3. `/configureaza-server simulare:False actualizeaza_permisiuni:True` – ascunde serverul pentru cei fără rol.
+4. Șterge mesajele vechi din `#regulament` și `#alege-jocurile`, apoi `/posteaza-regulament` și `/panou-roluri`.
+5. Anunță în `#anunturi` că fiecare trebuie să-și aleagă jocurile din `#alege-jocurile`.
 
 ---
 

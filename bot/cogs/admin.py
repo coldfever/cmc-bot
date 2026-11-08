@@ -5,6 +5,8 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 
+from .roles import rules_view
+
 REGULAMENT = """**Regulament Critical Miss Club**
 
 **1. Respect.** Fără insulte, hărțuire, discriminare sau spam. Suntem aici să ne distrăm.
@@ -20,7 +22,9 @@ REGULAMENT = """**Regulament Critical Miss Club**
 • După o tranzacție reușită dați `/rep` celuilalt. Țepele se raportează staff-ului.
 • Anunțurile expiră automat; închideți-le cu `/finalizat` când ați vândut.
 
-Problemă? Scrieți unui membru **Staff**."""
+Problemă? Scrieți unui membru **Staff**.
+
+👇 **Apasă butonul de mai jos ca să intri pe server.**"""
 
 
 class Admin(commands.Cog):
@@ -32,7 +36,11 @@ class Admin(commands.Cog):
     @app_commands.guild_only()
     async def rules(self, interaction: discord.Interaction):
         channel = self.bot.bot_channel(interaction.guild, "regulament") or interaction.channel
-        await channel.send(embed=discord.Embed(description=REGULAMENT, colour=discord.Colour.red()))
+        view = rules_view() if self.bot.cfg.verification else None
+        if view:
+            await channel.send(embed=discord.Embed(description=REGULAMENT, colour=discord.Colour.red()), view=view)
+        else:
+            await channel.send(embed=discord.Embed(description=REGULAMENT, colour=discord.Colour.red()))
         await interaction.response.send_message(f"Postat în {channel.mention}. Îl poți edita din `bot/cogs/admin.py`.", ephemeral=True)
 
     @app_commands.command(name="anunta", description="Trimite un anunț oficial (embed) ca bot.")
@@ -63,6 +71,9 @@ class Admin(commands.Cog):
         game_roles = [self.bot.find_role(guild, g.role) for g in self.bot.cfg.games]
         too_high = [r.name for r in game_roles if r and r >= me.top_role]
         lines.append("✅ Rolul botului e deasupra rolurilor de joc" if not too_high else f"❌ Mută rolul botului deasupra: {', '.join(too_high)}")
+        if self.bot.cfg.verification:
+            ok = self.bot.find_role(guild, self.bot.cfg.member_role) is not None
+            lines.append(f"{'✅' if ok else '❌'} rol {self.bot.cfg.member_role} (verificare)")
         for purpose, name in self.bot.cfg.bot_channels.items():
             ok = self.bot.bot_channel(guild, purpose) is not None
             lines.append(f"{'✅' if ok else '❌'} canal #{name}")

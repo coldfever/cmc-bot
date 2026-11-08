@@ -18,6 +18,7 @@ class ChannelSpec:
     type: str = "text"  # text | forum | voce
     readonly: bool = False
     topic: str | None = None
+    access: str | None = None  # None = ca la categorie | membri | staff
 
 
 @dataclass
@@ -60,6 +61,7 @@ def _channels(raw: list[dict]) -> list[ChannelSpec]:
             type=c.get("tip", "text"),
             readonly=bool(c.get("doar_citire", False)),
             topic=c.get("subiect"),
+            access=c.get("acces"),
         )
         for c in raw
     ]
@@ -81,6 +83,9 @@ class Config:
         self.staff_role = roles.get("staff", {}).get("nume", "Staff")
         self.staff_role_raw = roles.get("staff", {"nume": "Staff"})
         self.extra_roles = roles.get("extra", [])
+        ver = raw.get("verificare") or {}
+        self.verification = bool(ver.get("activ", False))
+        self.member_role: str | None = ver.get("rol", "Membru") if self.verification else None
         self.forum_tags: list[str] = raw.get("etichete_forum", [])
         self.trade_expiry_days = int(raw.get("expirare_anunturi_zile", 30))
 

@@ -12,7 +12,14 @@ fus_orar: Europe/Bucharest
 # Atenție: membrii existenți nu vor mai vedea jocurile până nu își aleg
 # rolurile în #alege-jocurile. Recomandat: pornește cu false, anunță
 # membrii, apoi treci pe true.
-ascunde_jocuri_fara_rol: false
+ascunde_jocuri_fara_rol: true
+
+# Verificare la intrare: membrul nou vede doar categoria "Bun venit".
+# Apasă butonul "Accept regulamentul" din #regulament, primește rolul de mai jos
+# și abia apoi vede restul serverului și #alege-jocurile.
+verificare:
+  activ: true
+  rol: Membru
 
 # Numele canalelor folosite de funcțiile botului (trebuie să existe mai jos)
 canale_bot:
@@ -30,6 +37,7 @@ roluri:
     separat: true      # apare separat în lista de membri
   extra:
     - { nume: Judge, culoare: "#f1c40f", separat: true }
+    - { nume: Membru, culoare: "#95a5a6", separat: false }
 
 # Canalele standard ale fiecărui joc (dacă jocul nu are "canale" proprii)
 canale_joc_standard:
@@ -100,7 +108,7 @@ jocuri:
       - { nume: recomandari, tip: text }
 
 # Categoriile care nu țin de un joc. Ordinea de aici = ordinea pe server.
-# acces: public | staff
+# acces: public (toată lumea) | membri (doar după acceptarea regulamentului) | staff
 # Categoriile de joc se pun automat după "CMC | Comunitate".
 categorii:
   - nume: "CMC | Bun venit"
@@ -109,10 +117,10 @@ categorii:
       - { nume: bun-venit, tip: text, doar_citire: true }
       - { nume: regulament, tip: text, doar_citire: true }
       - { nume: anunturi, tip: text, doar_citire: true, subiect: "Anunțuri oficiale Critical Miss Club." }
-      - { nume: alege-jocurile, tip: text, doar_citire: true, subiect: "Alege jocurile pe care le joci ca să primești acces și notificări." }
+      - { nume: alege-jocurile, tip: text, doar_citire: true, acces: membri, subiect: "Apasă pe iconițe ca să vezi canalele jocurilor tale." }
 
   - nume: "CMC | Magazin si evenimente"
-    acces: public
+    acces: membri
     canale:
       - { nume: program-si-locatie, tip: text, doar_citire: true }
       - { nume: evenimente, tip: text, doar_citire: true, subiect: "Turnee și seri de joc. Înscrierea se face cu butoanele de sub anunț." }
@@ -120,7 +128,7 @@ categorii:
       - { nume: stoc-si-precomenzi, tip: text, doar_citire: true }
 
   - nume: "CMC | Comunitate"
-    acces: public
+    acces: membri
     canale:
       - { nume: general, tip: text }
       - { nume: off-topic, tip: text }
@@ -129,7 +137,7 @@ categorii:
       - { nume: sugestii, tip: text }
 
   - nume: "CMC | Voce"
-    acces: public
+    acces: membri
     canale:
       - { nume: Lounge, tip: voce }
       - { nume: Masa 1, tip: voce }
