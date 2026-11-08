@@ -23,7 +23,7 @@ def _color(hex_str: str | None) -> discord.Colour:
 
 
 def _norm(name: str) -> str:
-    return name.lower().replace(" ", "").replace("|", "").replace("-", "")
+    return "".join(ch for ch in name.lower() if ch.isalnum())
 
 
 class SetupServer(commands.Cog):
@@ -88,6 +88,19 @@ class SetupServer(commands.Cog):
     def _find_channel(category: discord.CategoryChannel, name: str):
         return next((c for c in category.channels if c.name == name or _norm(c.name) == _norm(name)), None)
 
+    def _find_elsewhere(self, guild: discord.Guild, name: str):
+        """Un canal cu același nume aflat într-o categorie care NU e în config (ex. Text Channels).
+        Numele generice (general, anunturi...) nu se caută, ca să nu confundăm canale din alte jocuri."""
+        if _norm(name) in {"general", "deckbuildingstrategie", "schimburivanzari", "anunturicompetitive", "cautajucatori", "recomandari"}:
+            return None
+        known = {_norm(c.name) for c in self.bot.cfg.categories}
+        for ch in guild.channels:
+            if isinstance(ch, discord.CategoryChannel):
+                continue
+            if _norm(ch.name) == _norm(name) and (ch.category is None or _norm(ch.category.name) not in known):
+                return ch
+        return None
+
     # ---------------------------------------------------------------- comanda
     @app_commands.command(name="configureaza-server", description="Creează rolurile, categoriile și canalele lipsă din config (nu șterge nimic).")
     @app_commands.describe(
@@ -106,9 +119,13 @@ class SetupServer(commands.Cog):
         reason = f"/configureaza-server de {interaction.user}"
 
         # 1. Roluri
-        roles: dict[str, discord.Role] = {r.name: r for r in guild.roles}
+        roles: dict[str, discord.Role] = {}
         for spec in self._wanted_roles():
-            if spec["name"] in roles:
+            found = self.bot.find_role(guild, spec["name"])
+            if found is not None:
+                roles[spec["name"]] = found
+                if found.name != spec["name"]:
+                    report.append(f"= rolul `{found.name}` folosit pentru `{spec['name']}`")
                 continue
             report.append(f"+ rol `{spec['name']}`")
             if not simulare:
@@ -156,6 +173,14 @@ class SetupServer(commands.Cog):
                             await existing.edit(overwrites=self._channel_overwrites(guild, category, ch_spec, roles), reason=reason)
                     continue
 
+                elsewhere = self._find_elsewhere(guild, ch_spec.name)
+                if elsewhere is not None:
+                    where = elsewhere.category.name if elsewhere.category else "fără categorie"
+                    report.append(
+                        f"! `#{elsewhere.name}` există deja în **{where}**. Nu creez duplicat; "
+                        f"mută-l manual în {cat_spec.name} dacă vrei."
+                    )
+                    continue
                 report.append(f"+ {ch_spec.type} `{ch_spec.name}` în {cat_spec.name}")
                 if simulare or category is None:
                     continue

@@ -36,7 +36,7 @@ class GameSelect(discord.ui.Select):
             name = self._role_name(g)
             if not name:
                 continue
-            role = discord.utils.get(guild.roles, name=name)
+            role = self.bot.find_role(guild, name)
             if role is None:
                 if g.key in chosen:
                     missing.append(name)

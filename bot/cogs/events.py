@@ -203,7 +203,7 @@ class Events(commands.Cog):
         mention = ""
         if game and ping != "nimeni":
             role_name = game.competitive_role if ping == "competitiv" and game.competitive_role else game.role
-            role = discord.utils.get(guild.roles, name=role_name)
+            role = self.bot.find_role(guild, role_name)
             mention = role.mention if role else ""
         msg = await channel.send(
             content=mention or None,

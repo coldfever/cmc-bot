@@ -81,6 +81,17 @@ class CMCBot(commands.Bot):
                 return ch
         return None
 
+    @staticmethod
+    def norm(name: str) -> str:
+        """Nume comparabil: fără majuscule, spații, liniuțe, bare sau emoji."""
+        return "".join(ch for ch in name.lower() if ch.isalnum())
+
+    def find_role(self, guild: discord.Guild, name: str | None) -> discord.Role | None:
+        if not name:
+            return None
+        exact = discord.utils.get(guild.roles, name=name)
+        return exact or next((r for r in guild.roles if self.norm(r.name) == self.norm(name)), None)
+
     def bot_channel(self, guild: discord.Guild, purpose: str):
         return self.channel_by_name(guild, self.cfg.channel_name(purpose))
 

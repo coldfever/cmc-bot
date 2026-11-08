@@ -60,7 +60,7 @@ class Admin(commands.Cog):
                          ("manage_events", "Manage Events"), ("manage_threads", "Manage Threads")]:
             lines.append(f"{'✅' if getattr(perms, p) else '❌'} {label}")
         lines.append(f"{'✅' if 'COMMUNITY' in guild.features else '⚠️'} Server Community (necesar pentru forumuri)")
-        game_roles = [discord.utils.get(guild.roles, name=g.role) for g in self.bot.cfg.games]
+        game_roles = [self.bot.find_role(guild, g.role) for g in self.bot.cfg.games]
         too_high = [r.name for r in game_roles if r and r >= me.top_role]
         lines.append("✅ Rolul botului e deasupra rolurilor de joc" if not too_high else f"❌ Mută rolul botului deasupra: {', '.join(too_high)}")
         for purpose, name in self.bot.cfg.bot_channels.items():
