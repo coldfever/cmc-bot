@@ -1,0 +1,149 @@
+# =====================================================================
+#  Critical Miss Club – structura serverului
+#  Acesta este SINGURUL loc unde se definesc rolurile, categoriile și
+#  canalele. Comanda /configureaza-server citește fișierul și creează pe
+#  Discord ce lipsește. Nu șterge niciodată nimic.
+#  Ca să schimbi ceva: editezi aici, faci deploy, rulezi din nou comanda.
+# =====================================================================
+
+fus_orar: Europe/Bucharest
+
+# Dacă e true, categoriile de joc se văd DOAR de cine are rolul jocului.
+# Atenție: membrii existenți nu vor mai vedea jocurile până nu își aleg
+# rolurile în #alege-jocurile. Recomandat: pornește cu false, anunță
+# membrii, apoi treci pe true.
+ascunde_jocuri_fara_rol: false
+
+# Numele canalelor folosite de funcțiile botului (trebuie să existe mai jos)
+canale_bot:
+  bun_venit: bun-venit
+  regulament: regulament
+  alege_jocuri: alege-jocurile
+  evenimente: evenimente
+  rezultate: rezultate-turnee
+  mod_log: mod-log
+
+roluri:
+  staff:
+    nume: Staff
+    culoare: "#e74c3c"
+    separat: true      # apare separat în lista de membri
+  extra:
+    - { nume: Judge, culoare: "#f1c40f", separat: true }
+
+# Canalele standard ale fiecărui joc (dacă jocul nu are "canale" proprii)
+canale_joc_standard:
+  - { nume: general, tip: text }
+  - { nume: deckbuilding-strategie, tip: text, subiect: "Liste, idei de deck, meta." }
+  - { nume: schimburi-vanzari, tip: forum, subiect: "Vând / Cumpăr / Schimb. Folosiți /anunt-schimb. Citiți regulamentul." }
+  - { nume: anunturi-competitive, tip: text, doar_citire: true, subiect: "Turnee și anunțuri competitive." }
+
+jocuri:
+  - cheie: pokemon
+    nume: Pokemon
+    emoji: "⚡"
+    categorie: "CMC | Pokemon"
+    rol: Pokemon
+    rol_competitiv: Competitive Pokemon
+    culoare: "#ffcb05"
+    cautare_carti: pokemon
+  - cheie: onepiece
+    nume: One Piece
+    emoji: "🏴‍☠️"
+    categorie: "CMC | One Piece"
+    rol: One Piece
+    rol_competitiv: Competitive One Piece
+    culoare: "#d62828"
+  - cheie: riftbound
+    nume: Riftbound
+    emoji: "🌀"
+    categorie: "CMC | Riftbound"
+    rol: Riftbound
+    rol_competitiv: Competitive Riftbound
+    culoare: "#3a86ff"
+  - cheie: magic
+    nume: Magic
+    emoji: "🧙"
+    categorie: "CMC | Magic"
+    rol: Magic
+    rol_competitiv: Competitive Magic
+    culoare: "#8338ec"
+    cautare_carti: magic
+  - cheie: ctcg
+    nume: Cyberpunk TCG
+    emoji: "🤖"
+    categorie: "CMC | Cyberpunk TCG"
+    rol: Cyberpunk TCG
+    rol_competitiv: Competitive CTCG
+    culoare: "#fcee0a"
+    canale:
+      - { nume: general, tip: text }
+      - { nume: deckbuilding-strategie, tip: text }
+      - { nume: schimburi-vanzari, tip: forum }
+      - { nume: ctcg-announcements, tip: text, doar_citire: true, subiect: "Anunțuri competitive Cyberpunk TCG." }
+  - cheie: neuroscape
+    nume: Neuroscape
+    emoji: "🧠"
+    categorie: "CMC | Neuroscape"
+    rol: Neuroscape
+    rol_competitiv: Competitive Neuroscape
+    culoare: "#06d6a0"
+  - cheie: boardgames
+    nume: Board Games
+    emoji: "🎲"
+    categorie: "CMC | Board Games"
+    rol: Board Games
+    culoare: "#8d6e63"
+    canale:
+      - { nume: general, tip: text }
+      - { nume: cauta-jucatori, tip: text, subiect: "Cine vine la o partidă?" }
+      - { nume: recomandari, tip: text }
+
+# Categoriile care nu țin de un joc. Ordinea de aici = ordinea pe server.
+# acces: public | staff
+# Categoriile de joc se pun automat după "CMC | Comunitate".
+categorii:
+  - nume: "CMC | Bun venit"
+    acces: public
+    canale:
+      - { nume: bun-venit, tip: text, doar_citire: true }
+      - { nume: regulament, tip: text, doar_citire: true }
+      - { nume: anunturi, tip: text, doar_citire: true, subiect: "Anunțuri oficiale Critical Miss Club." }
+      - { nume: alege-jocurile, tip: text, doar_citire: true, subiect: "Alege jocurile pe care le joci ca să primești acces și notificări." }
+
+  - nume: "CMC | Magazin si evenimente"
+    acces: public
+    canale:
+      - { nume: program-si-locatie, tip: text, doar_citire: true }
+      - { nume: evenimente, tip: text, doar_citire: true, subiect: "Turnee și seri de joc. Înscrierea se face cu butoanele de sub anunț." }
+      - { nume: rezultate-turnee, tip: text, doar_citire: true }
+      - { nume: stoc-si-precomenzi, tip: text, doar_citire: true }
+
+  - nume: "CMC | Comunitate"
+    acces: public
+    canale:
+      - { nume: general, tip: text }
+      - { nume: off-topic, tip: text }
+      - { nume: pulls-si-colectii, tip: text, subiect: "Arătați ce ați deschis!" }
+      - { nume: cauta-jucatori, tip: text }
+      - { nume: sugestii, tip: text }
+
+  - nume: "CMC | Voce"
+    acces: public
+    canale:
+      - { nume: Lounge, tip: voce }
+      - { nume: Masa 1, tip: voce }
+      - { nume: Masa 2, tip: voce }
+      - { nume: Turneu, tip: voce }
+
+  - nume: "CMC | Staff"
+    acces: staff
+    canale:
+      - { nume: staff-chat, tip: text }
+      - { nume: mod-log, tip: text }
+
+# Etichetele create în canalele forum de schimburi
+etichete_forum: ["Vând", "Cumpăr", "Schimb", "Licitație", "Finalizat"]
+
+# După câte zile se închid automat anunțurile de schimb
+expirare_anunturi_zile: 30
